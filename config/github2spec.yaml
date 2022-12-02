@@ -32,7 +32,7 @@ repositories:
     # these work on RH8 (GLIB-C 2.28) too, where ubuntu20 is based on GLIB-C 2.29, and that does not work on RH8.
     asset_filter: 'wal-g-pg-ubuntu-18.04-amd64.tar.gz$'
     requires:
-      - "glibc < 2.29"
+      - glibc
     files:
      - src: 'wal-g-pg-ubuntu-18.04-amd64'
        dest: '%{_bindir}/wal-g-pg'

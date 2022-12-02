@@ -1,7 +1,9 @@
 #!/bin/bash
 set -e
-github2spec
-for SPEC in /host/specs/*.spec; do
-  rpmbuild -ba "${SPEC}"
-done
-cp /home/rpmbuilder/rpmbuild/RPMS/*/*.rpm /host/rpms/
+
+cd $(dirname $0)
+./generate_specs.sh
+./build_rpms.sh
+./sign_rpms.sh
+
+echo Done

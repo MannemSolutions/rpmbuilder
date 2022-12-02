@@ -16,6 +16,8 @@ Url: {{ url }}
 %prep
 {% for asset in assets %}curl -L {{ asset.url }} -o %{_sourcedir}/{{ asset.name }}
 {% endfor %}
+{% for cmd in prep %}{{ cmd }}
+{% endfor %}
 
 %install
 mkdir -p %{buildroot}/%{_bindir}

@@ -1,65 +1,67 @@
 template: /usr/rpmbuilder/templates/spec.j2
-dest: /host/specs
+#dest: /host/specs
 repositories:
   pgfga:
     organization: mannemsolutions
-    repository: pgfga
-    asset_filter: 'pgfga-{{ version }}-linux-amd64.tar.gz$'
+    asset_filter: '{{ repository }}-{{ version }}-linux-{{ binary_arch }}.tar.gz$'
     files:
-     - src: 'pgfga'
-       dest: '%{_bindir}/pgfga'
+     - src: '{{ repository }}'
+       dest: '%{_bindir}/{{ repository }}'
        mode: '0755'
   pgroute66:
     organization: mannemsolutions
-    repository: pgroute66
-    asset_filter: 'pgroute66-{{ version }}-linux-amd64.tar.gz$'
+    asset_filter: '{{ repository }}-{{ version }}-linux-{{ binary_arch }}.tar.gz$'
     files:
-     - src: 'pgroute66'
-       dest: '%{_bindir}/pgroute66'
+     - src: '{{ repository }}'
+       dest: '%{_bindir}/{{ repository }}'
        mode: '0755'
   pgquartz:
     organization: mannemsolutions
-    repository: pgquartz
-    asset_filter: 'pgquartz-{{ version }}-linux-amd64.tar.gz$'
+    asset_filter: '{{ repository }}-{{ version }}-linux-{{ binary_arch }}.tar.gz$'
     files:
-     - src: 'pgquartz'
-       dest: '%{_bindir}/pgquartz'
+     - src: '{{ repository }}'
+       dest: '%{_bindir}/{{ repository }}'
        mode: '0755'
   wal-g-pg:
+    organization: 'wal-g'
+    repository: 'wal-g'
     license: Apache-2.0
-    repository: wal-g
-    # Yes, wal-g-pg-ubuntu-18.04-amd64.tar.gz is weird for a RH8 rpm, but ubuntu 18.04 has GLIB-C 2.26, and
-    # these work on RH8 (GLIB-C 2.28) too, where ubuntu20 is based on GLIB-C 2.29, and that does not work on RH8.
-    asset_filter: 'wal-g-pg-ubuntu-18.04-amd64.tar.gz$'
+    version: v2.0.1bb
+    prep:
+      - 'bash /gobuild.sh -o sebasmannem -r {{ repository }} -t deps -t pg_build'
+    asset_filter: '{{ package_name }}-ubuntu-18.04-{{ binary_arch }}.tar.gz$'
     requires:
-      - "glibc < 2.29"
+      - glibc
     files:
-     - src: 'wal-g-pg-ubuntu-18.04-amd64'
-       dest: '%{_bindir}/wal-g-pg'
+     - src: '{{ repository }}/main/pg/{{ repository }}'
+       dest: '%{_bindir}/{{ package_name }}'
        mode: '0755'
   stolon:
+    version: v0.17.0b
+    prep:
+      - 'bash /gobuild.sh -o sebasmannem -r stolon'
     organization: sorintlab
-    repository: stolon
+    asset_filter: 'Source code'
     files:
-     - src: 'stolon-{{ version }}-linux-amd64/bin/stolonctl'
+     - src: '{{ repository }}/bin/stolonctl'
        dest: '%{_bindir}/stolonctl'
        mode: '0755'
-     - src: 'stolon-{{ version }}*-linux-amd64/bin/stolon-sentinel'
+     - src: '{{ repository }}/bin/stolon-sentinel'
        dest: '%{_bindir}/stolon-sentinel'
        mode: '0755'
-     - src: 'stolon-{{ version }}-linux-amd64/bin/stolon-proxy'
+     - src: '{{ repository }}/bin/stolon-proxy'
        dest: '%{_bindir}/stolon-proxy'
        mode: '0755'
-     - src: 'stolon-{{ version }}-linux-amd64/bin/stolon-keeper'
+     - src: '{{ repository }}/bin/stolon-keeper'
        dest: '%{_bindir}/stolon-keeper'
        mode: '0755'
   etcd:
     organization: etcd-io
-    repository: etcd
+    asset_filter: '{{ package_name }}-{{ version }}-linux-{{ binary_arch }}.tar.gz$'
     files:
-     - src: 'etcd-{{ version }}-linux-amd64/etcdctl'
+     - src: 'etcd-{{ version }}-linux-{{ binary_arch }}/etcdctl'
        dest: '%{_bindir}/etcdctl'
        mode: '0755'
-     - src: 'etcd-{{ version }}-linux-amd64/etcd'
+     - src: 'etcd-{{ version }}-linux-{{ binary_arch }}/etcd'
        dest: '%{_bindir}/etcd'
        mode: '0755'

@@ -1,20 +1,26 @@
 #!/usr/bin/env python3
 """
-A github repo class that can read a github repo and generate a spec file.
+A gitHub repo class that can read a gitHub repo and generate a spec file.
 """
 import re
+import platform
 import requests
 import jinja2
+
+BINARY_ARCH = {
+    'aarch64': 'arm64',
+    'x86_64': 'amd64',
+}
 
 
 class GithubRepo(dict):
     """
-    Read a github repo and generate a spec file using a jinja2 template
+    Read a gitHub repo and generate a spec file using a jinja2 template
     """
     def __init__(self, values):
         super().__init__()
         # Set some defaults in values, also used to set self['url']
-        values['site'] = values.get('site', "github.com")
+        values['site'] = values.get('site', "gitHub.com")
         values['repository'] = values.get('repository', values['name'])
         values['organization'] = values.get('organization',
                                             values['repository'])
@@ -22,14 +28,15 @@ class GithubRepo(dict):
         # These defaults can be overridden from the yaml config if needed
         self['url'] = f'https://{values["site"]}/{values["organization"]}/' \
                       f'{values["repository"]}'
-        self['package_arch'] = 'x86_64'
-        self['binary_arch'] = 'amd64'
+        self['package_arch'] = platform.machine()
+        self['binary_arch'] = BINARY_ARCH.get(platform.machine(),
+                                              platform.machine())
         self['target_release'] = 'latest'
         self['package_name'] = values['name']
         self['asset_filter'] = '{{ name }}-{{ version }}-linux-' \
                                '{{ binary_arch }}.tar.gz$'
 
-        # Copy values into self, get data from github api and overwrite
+        # Copy values into self, get data from gitHub api and overwrite
         # values as needed
         self.update(values)
         self.get_release_info()
@@ -37,12 +44,12 @@ class GithubRepo(dict):
 
     def get_repo_info(self):
         """
-        Read and return repo on the actual github repo using the github api
+        Read and return repo on the actual gitHub repo using the gitHub api
         :return: A dictionary with repo info like name, description and license
         """
         url = f'https://api.{self["site"]}/repos/{self["organization"]}/' \
               f'{self["repository"]}'
-        result = requests.get(url)
+        result = requests.get(url, timeout=10)
         data = result.json()
         if 'name' not in data:
             raise Exception("Missing 'name' in the return.", data)
@@ -54,13 +61,13 @@ class GithubRepo(dict):
 
     def get_release_info(self):
         """
-        Read release info from the actual github repo using the github api
+        Read release info from the actual gitHub repo using the gitHub api
         :return: a dictionary with release info (version, and changelog)
         """
         self.get_repo_info()
         url = f'https://api.{self["site"]}/repos/{self["organization"]}/' \
               f'{self["repository"]}/releases/{self["target_release"]}'
-        result = requests.get(url)
+        result = requests.get(url, timeout=10)
         data = result.json()
 
         self['release_info'] = release_info = {}

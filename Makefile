@@ -25,3 +25,6 @@ update_specs:
 publish:
 	python rpmbuilder/setup.py sdist bdist_wheel
 	twine check dist/*
+
+build_rpms:
+	./build_with_docker.sh
